@@ -131,4 +131,64 @@ describe Checkout::OfferCodePolicy do
       end
     end
   end
+
+  permissions :statistics? do
+    context "when the offer code belongs to seller" do
+      let(:offer_code) { create(:offer_code, user: seller) }
+
+      it "grants access to owner" do
+        seller_context = SellerContext.new(user: seller, seller:)
+        expect(subject).to permit(seller_context, offer_code)
+      end
+
+      it "grants access to accountant" do
+        seller_context = SellerContext.new(user: accountant_for_seller, seller:)
+        expect(subject).to permit(seller_context, offer_code)
+      end
+
+      it "grants access to admin" do
+        seller_context = SellerContext.new(user: admin_for_seller, seller:)
+        expect(subject).to permit(seller_context, offer_code)
+      end
+
+      it "grants access to marketing" do
+        seller_context = SellerContext.new(user: marketing_for_seller, seller:)
+        expect(subject).to permit(seller_context, offer_code)
+      end
+
+      it "grants access to support" do
+        seller_context = SellerContext.new(user: support_for_seller, seller:)
+        expect(subject).to permit(seller_context, offer_code)
+      end
+    end
+
+    context "when the offer code belongs to other user" do
+      let(:offer_code) { create(:offer_code) }
+
+      it "denies access to owner" do
+        seller_context = SellerContext.new(user: seller, seller:)
+        expect(subject).not_to permit(seller_context, offer_code)
+      end
+
+      it "denies access to accountant" do
+        seller_context = SellerContext.new(user: accountant_for_seller, seller:)
+        expect(subject).not_to permit(seller_context, offer_code)
+      end
+
+      it "denies access to admin" do
+        seller_context = SellerContext.new(user: admin_for_seller, seller:)
+        expect(subject).not_to permit(seller_context, offer_code)
+      end
+
+      it "denies access to marketing" do
+        seller_context = SellerContext.new(user: marketing_for_seller, seller:)
+        expect(subject).not_to permit(seller_context, offer_code)
+      end
+
+      it "denies access to support" do
+        seller_context = SellerContext.new(user: support_for_seller, seller:)
+        expect(subject).not_to permit(seller_context, offer_code)
+      end
+    end
+  end
 end

@@ -182,6 +182,12 @@ describe Checkout::DiscountsController do
       )
     end
 
+    it "returns a 404 error for another seller's offer code" do
+      other_offer_code = create(:offer_code, user: create(:user))
+
+      expect { get :statistics, params: { id: other_offer_code.external_id }, as: :json }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it "does not reinterpret purchases made before order-level pricing was enabled" do
       offer_code.update!(amount_percentage: nil, amount_cents: 100, once_per_cart: true)
       purchase1.update!(quantity: 5)
